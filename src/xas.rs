@@ -121,17 +121,18 @@ impl Xas {
         let x = x.iter2();
         let y = &self.mu;
         let y = y.iter2();
-        let size = self.mu.len() - 1;
 
-        println!("{} {}", self.mu[size], self.mui[size]);
-        println!("{} {}", self.ene[size], self.energy[size]);
+        // println!("{} {}", self.ene[size], self.energy[size]);
+        // println!("{} {}", self.mu[size], self.mui[size]);
 
         println!("{} {}", self.ene.len(), self.energy.len());
         println!("{} {}", self.mu.len(), self.mui.len());
 
-        let x2 = &self.energy;
+        let size = self.mui.len();
+        let diff = self.mui.len() - self.mu.len();
+        let x2 = &self.energy[0..size - diff];
         let x2 = x2.iter2();
-        let y2 = &self.mui;
+        let y2 = &self.mui[0..size - diff];
         let y2 = y2.iter2();
 
         fg.axes2d()
