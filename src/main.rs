@@ -44,7 +44,8 @@ fn run() -> Result<(), Error> {
     };
 
     let xas = xmcd_rs::xas::Xas::new(input)?;
-    println!("{:?}", xas);
+    // println!("{:?}", xas);
+    xas.plot()?;
 
     Ok(())
 }

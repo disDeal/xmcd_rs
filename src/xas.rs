@@ -1,8 +1,4 @@
-pub fn foo() {
-    println!("Hello");
-}
-
-use peroxide::*;
+use gnuplot::*;
 
 use nalgebra::DVector;
 use rbf_interp::{Basis, Scatter};
@@ -35,7 +31,10 @@ impl Xas {
         let start = ene[0].round();
         let stop = ene[size - 1].round();
         let num = ((stop - start) / step) as u32 + 1;
-        let energy = peroxide::linspace!(start, stop, num);
+        // let energy = peroxide::linspace!(start, stop, num);
+        let energy = (0..num)
+            .map(|i| start + (i as f64 / size as f64) * (stop - start))
+            .collect::<Vec<_>>();
 
         let mui = Xas::interpolate(ene.clone(), mu.clone(), energy.clone());
         let e0 = Xas::find_max_energy(mui.clone(), &energy)?;
@@ -113,5 +112,72 @@ impl Xas {
         }
 
         Ok((ene, i0, i1))
+    }
+
+    pub fn plot(&self) -> Result<(), Error> {
+        let mut fg = Figure::new();
+        fg.set_terminal("wxt size 1200,800", "out");
+        let x = &self.ene;
+        let x = x.iter2();
+        let y = &self.mu;
+        let y = y.iter2();
+        let size = self.mu.len() - 1;
+
+        println!("{} {}", self.mu[size], self.mui[size]);
+        println!("{} {}", self.ene[size], self.energy[size]);
+
+        println!("{} {}", self.ene.len(), self.energy.len());
+        println!("{} {}", self.mu.len(), self.mui.len());
+
+        let x2 = &self.energy;
+        let x2 = x2.iter2();
+        let y2 = &self.mui;
+        let y2 = y2.iter2();
+
+        fg.axes2d()
+            .set_size(1.0, 0.7)
+            .set_pos(0.0, 0.2)
+            .points(
+                x,
+                y,
+                &[
+                    PointSymbol('o'),
+                    Color("blue"),
+                    BorderColor("red"),
+                    LineWidth(2.0),
+                ],
+            )
+            .lines(x2, y2, &[Color("red"), BorderColor("red")]);
+
+        fg.show().unwrap();
+        Ok(())
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct BetterIterator<'l, T: 'l> {
+    idx: usize,
+    slice: &'l [T],
+}
+
+impl<'l, T: 'l> Iterator for BetterIterator<'l, T> {
+    type Item = &'l T;
+    fn next(&mut self) -> Option<&'l T> {
+        let ret = self.slice.get(self.idx);
+        self.idx += 1;
+        ret
+    }
+}
+
+pub trait BetterIteratorExt<'l, T> {
+    fn iter2(self) -> BetterIterator<'l, T>;
+}
+
+impl<'l, T: 'l> BetterIteratorExt<'l, T> for &'l [T] {
+    fn iter2(self) -> BetterIterator<'l, T> {
+        BetterIterator {
+            idx: 0,
+            slice: self,
+        }
     }
 }
