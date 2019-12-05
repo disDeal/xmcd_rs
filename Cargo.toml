@@ -10,6 +10,7 @@ edition = "2018"
 structopt = "0.3"
 atoi = "0.3"
 blas = "0.20"
+plotters = {git="https://github.com/38/plotters.git", branch="master"}
 
 [dependencies.peroxide]
 git = "https://github.com/Axect/Peroxide.git"

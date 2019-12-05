@@ -20,13 +20,8 @@ struct Opt {
 }
 
 pub struct Xas {
-    step: f64,
-    param: Vec<f64>,
-    cov: Vec<f64>,
     fit_preedge: Vec<f64>,
     ene: Vec<f64>,
-    i0: Vec<f64>,
-    i1: Vec<f64>,
     energy: Vec<f64>,
     mui: Vec<f64>,
     mu: Vec<f64>,
@@ -34,13 +29,11 @@ pub struct Xas {
 }
 
 impl Xas {
-    pub fn new<R>(mut input: R) -> Result<Xas, Error>
+    pub fn new<R>(input: R) -> Result<Xas, Error>
     where
         R: io::BufRead,
     {
         let step = 0.1;
-        let param = Vec::new();
-        let cov = Vec::new();
         let fit_preedge = Vec::new();
 
         let (ene, i0, i1) = Xas::load_from_file(input)?;
@@ -57,16 +50,13 @@ impl Xas {
         let e0 = Xas::find_max_energy(mui.clone(), &energy)?;
 
         Ok(Xas {
-            step,
             ene,
-            i0,
-            i1,
+
             mu,
             energy,
             mui,
             e0,
-            param,
-            cov,
+
             fit_preedge,
         })
     }
