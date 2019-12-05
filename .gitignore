@@ -2,3 +2,4 @@
 **/*.rs.bk
 /xmcd_py
 perf*
+/vendor

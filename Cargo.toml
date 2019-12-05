@@ -9,3 +9,9 @@ edition = "2018"
 [dependencies]
 structopt = "0.3"
 atoi = "0.3"
+blas = "0.20"
+
+[dependencies.peroxide]
+git = "https://github.com/Axect/Peroxide.git"
+default-features = false
+features = ["O3", "plot", "dataframe"] 
