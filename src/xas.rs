@@ -9,10 +9,10 @@ use crate::{bail, Error, Reader};
 pub struct Xas {
     fit_preedge: Vec<f64>,
     ene: Vec<f64>,
-    energy: Vec<f64>,
-    mui: Vec<f64>,
     mu: Vec<f64>,
-    e0: f64,
+    pub energy: Vec<f64>,
+    pub mui: Vec<f64>,
+    pub e0: f64,
 }
 
 impl Xas {
@@ -38,6 +38,11 @@ impl Xas {
 
         let mui = Xas::interpolate(ene.clone(), mu.clone(), energy.clone());
         let e0 = Xas::find_max_energy(mui.clone(), &energy)?;
+
+        let size = mui.len();
+        let diff = mui.len() - mu.len();
+        let energy = energy[0..size - diff].to_vec();
+        let mui = mui[0..size - diff].to_vec();
 
         Ok(Xas {
             ene,
@@ -122,17 +127,9 @@ impl Xas {
         let y = &self.mu;
         let y = y.iter2();
 
-        // println!("{} {}", self.ene[size], self.energy[size]);
-        // println!("{} {}", self.mu[size], self.mui[size]);
-
-        println!("{} {}", self.ene.len(), self.energy.len());
-        println!("{} {}", self.mu.len(), self.mui.len());
-
-        let size = self.mui.len();
-        let diff = self.mui.len() - self.mu.len();
-        let x2 = &self.energy[0..size - diff];
+        let x2 = &self.energy;
         let x2 = x2.iter2();
-        let y2 = &self.mui[0..size - diff];
+        let y2 = &self.mui;
         let y2 = y2.iter2();
 
         fg.axes2d()
