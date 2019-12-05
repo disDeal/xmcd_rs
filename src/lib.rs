@@ -7,7 +7,7 @@ pub use self::error::Error;
 pub use self::reader::Reader;
 
 mod error {
-    use std::{fmt, io};
+    use std::{error, fmt, io};
 
     #[derive(Debug)]
     pub enum Error {
@@ -38,7 +38,7 @@ mod error {
         }
     }
 
-    impl std::error::Error for Error {}
+    impl error::Error for Error {}
 }
 mod reader {
     use std::fs;
