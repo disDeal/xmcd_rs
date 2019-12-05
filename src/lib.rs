@@ -6,6 +6,33 @@ mod macros;
 pub use self::error::Error;
 pub use self::reader::Reader;
 
+#[derive(Debug)]
+pub enum Mode {
+    Xas,
+    Xmcd,
+}
+
+impl std::fmt::Display for Mode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Xas => write!(f, "xas"),
+            Self::Xmcd => write!(f, "xmcd"),
+        }
+    }
+}
+
+impl std::str::FromStr for Mode {
+    type Err = Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let s = match s {
+            "xas" | "XAS" | "Xas" => Mode::Xas,
+            "xmcd" | "XMCD" | "Xmcd" => Mode::Xmcd,
+            _ => bail!("Incorrect mode"),
+        };
+        Ok(s)
+    }
+}
+
 mod error {
     use std::{error, fmt, io};
 

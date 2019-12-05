@@ -2,23 +2,14 @@ pub fn foo() {
     println!("Hello");
 }
 
-use peroxide::numerical::interp::lagrange_polynomial;
 use peroxide::*;
-use std::fs;
-use std::io;
-use std::path::PathBuf;
-use std::process::exit;
 
-use structopt::StructOpt;
+use nalgebra::DVector;
+use rbf_interp::{Basis, Scatter};
 
 use crate::{bail, Error, Reader};
 
-#[derive(Debug, StructOpt)]
-struct Opt {
-    /// Optional path to input file; if not supplied will read from stdin
-    input: Option<PathBuf>,
-}
-
+#[derive(Debug)]
 pub struct Xas {
     fit_preedge: Vec<f64>,
     ene: Vec<f64>,
@@ -31,7 +22,7 @@ pub struct Xas {
 impl Xas {
     pub fn new<R>(input: R) -> Result<Xas, Error>
     where
-        R: io::BufRead,
+        R: std::io::BufRead,
     {
         let step = 0.1;
         let fit_preedge = Vec::new();
@@ -66,13 +57,25 @@ impl Xas {
     }
 
     fn interpolate(x: Vec<f64>, y: Vec<f64>, energy: Vec<f64>) -> Vec<f64> {
-        let interp_func = lagrange_polynomial(x, y);
-        interp_func.eval_vec(energy)
+        let x = x
+            .iter()
+            .map(|&x| DVector::from_vec(vec![x]))
+            .collect::<Vec<_>>();
+        let y = y
+            .iter()
+            .map(|&x| DVector::from_vec(vec![x]))
+            .collect::<Vec<_>>();
+
+        let interp_func = Scatter::create(x, y, Basis::PolyHarmonic(2), 2);
+        energy
+            .iter()
+            .map(|&x| interp_func.eval(DVector::from_vec(vec![f64::from(x)]))[0])
+            .collect::<Vec<_>>()
     }
 
     fn find_max_energy(array: Vec<f64>, energy: &[f64]) -> Result<f64, Error> {
-        let muidiff = array.windows(2).map(|x| x[1] - x[0]);
-        let mut iter = muidiff.enumerate();
+        // let muidiff = array.windows(2).map(|x| x[1] - x[0]);
+        let mut iter = array.iter().enumerate();
         let init = iter.next().ok_or("Need at least one input").unwrap();
         let max_index = iter
             .try_fold(init, |acc, x| {
@@ -84,14 +87,14 @@ impl Xas {
                 };
                 Some(max)
             })
-            .unwrap()
+            .expect("Cannot find max energy")
             .0;
         Ok(energy[max_index])
     }
 
     pub fn load_from_file<R>(mut input: R) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), Error>
     where
-        R: io::BufRead,
+        R: std::io::BufRead,
     {
         let mut ene = Vec::new();
         let mut i0 = Vec::new();
@@ -101,7 +104,7 @@ impl Xas {
         while input.read_line(&mut buffer)? > 0 {
             let line = buffer
                 .split(' ')
-                .map(|s| s.trim().parse::<f64>().unwrap())
+                .map(|s| s.trim().parse::<f64>().expect("Cannot parse to float"))
                 .collect::<Vec<_>>();
             ene.push(line[0]);
             i0.push(line[1]);
