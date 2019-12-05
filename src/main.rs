@@ -45,7 +45,10 @@ fn run() -> Result<(), Error> {
 
     let xas = xmcd_rs::xas::Xas::new(input)?;
     // println!("{:?}", xas);
-    xas.plot()?;
+    // xas.plot()?;
+    for i in 0..xas.mui.len() {
+        println!("{} {}", xas.energy[i], xas.mui[i]);
+    }
 
     Ok(())
 }

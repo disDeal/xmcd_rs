@@ -39,3 +39,45 @@
 1.31224e+01 -8.52274e+00 6.88911e-03 -2.44210e+00 -7.98120e-02
 1.33047e+01 -8.88661e+00 -2.16615e-02 -2.51967e+00 -1.36821e-01
 1.35924e+01 -9.46166e+00 0.00000e+00 -2.64894e+00 0.00000e+00
+
+
+
+    fn draw_xas(&self, draw: &app::Draw, rect: geom::Rect) {
+        let (left, right) = (rect.left(), rect.right());
+        let (top, bottom) = (rect.top(), rect.bottom());
+
+        let size = self.xas.energy.len() - 1;
+        let range = (self.xas.energy[0], self.xas.energy[size]);
+        let x = self
+            .xas
+            .energy
+            .iter()
+            .map(|&x| map_range(x, range.0, range.1, left, right) as f32)
+            .collect::<Vec<f32>>();
+
+        let y = self
+            .xas
+            .mui
+            .iter()
+            .map(|&x| map_range(x, self.bounds.0, self.bounds.1, 0., top) as f32)
+            .collect::<Vec<f32>>();
+
+        // let points = x.zip(y).map(|p| (pt2(p.0, p.1), BLUE));
+        // draw.polyline().weight(4.).colored_points(points);
+
+        let tris = (0..size)
+            // .step_by(2)
+            .flat_map(|i| {
+                let (p1, p2) = (pt2(x[i], y[i]), pt2(x[i + 1], y[i + 1]));
+                let zero_line = (pt2(x[i], 0f32), pt2(x[i + 1], 0f32));
+                geom::Quad([p1, p2, zero_line.1, zero_line.0]).triangles_iter()
+            })
+            .map(|tri| {
+                tri.map_vertices(|v| {
+                    let y_fract = map_range(v.y.abs(), 0.0, top, 0.0, 1.0);
+                    let color = rgba(1., 0.5, y_fract, y_fract.sqrt());
+                    geom::vertex::Srgba(v, color)
+                })
+            });
+        draw.mesh().tris(tris);
+    }
