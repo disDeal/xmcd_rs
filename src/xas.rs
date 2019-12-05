@@ -39,10 +39,13 @@ impl Xas {
         let mui = Xas::interpolate(ene.clone(), mu.clone(), energy.clone());
         let e0 = Xas::find_max_energy(mui.clone(), &energy)?;
 
-        let size = mui.len();
-        let diff = mui.len() - mu.len();
-        let energy = energy[0..size - diff].to_vec();
-        let mui = mui[0..size - diff].to_vec();
+        println!("{} {}", mui.len(), mu.len());
+        if mui.len() > mu.len() {
+            let size = mui.len();
+            let diff = mui.len() - mu.len();
+            let energy = energy[0..size - diff].to_vec();
+            let mui = mui[0..size - diff].to_vec();
+        }
 
         Ok(Xas {
             ene,
