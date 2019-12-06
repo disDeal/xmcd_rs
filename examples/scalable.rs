@@ -83,7 +83,7 @@ fn model(app: &App) -> Model {
             .unwrap()
             .1,
     );
-    println!("{:?}", &bounds);
+    // println!("{:?}", &bounds);
     let bounds = (1., 2.);
 
     Model {
@@ -98,6 +98,7 @@ fn update(app: &App, model: &mut Model, _update: Update) {
     let mouse = app.mouse;
     let win = (app.window_rect().left(), app.window_rect().right());
     let t = map_range(mouse.x, win.0, win.1, 0., 1.);
+    println!("{}", t);
     model.data.lerp(t);
 }
 

@@ -1,3 +1,5 @@
+use nannou::prelude::*;
+
 pub struct Data {
     one: Vec<(f32, f32)>,
     two: Vec<(f32, f32)>,
@@ -12,24 +14,36 @@ fn lerp(a: (f32, f32), b: (f32, f32), t: f32) -> (f32, f32) {
     (x, y)
 }
 
+fn lert_fl(a: f32, b: f32, t: f32) -> f32 {
+    a + (b - a) * t
+}
+
 impl Data {
     pub fn lerp(&mut self, t: f32) {
         let size = self.one.len();
         match t {
             t if t >= 0. && t < 0.33 => {
+                let t = map_range(t, 0., 0.33, 0., 1.);
                 for i in 0..size {
                     self.buffer[i] = lerp(self.one[i], self.two[i], t)
                 }
+                // println!("one two");
             }
             t if t >= 0.33 && t < 0.66 => {
+                let t = map_range(t, 0.33, 0.66, 0., 1.);
+
                 for i in 0..size {
                     self.buffer[i] = lerp(self.two[i], self.three[i], t)
                 }
+                // println!("two three");
             }
             t if t >= 0.66 && t <= 1. => {
+                let t = map_range(t, 0.66, 1., 0., 1.);
+
                 for i in 0..size {
                     self.buffer[i] = lerp(self.three[i], self.four[i], t)
                 }
+                // println!("three four");
             }
             _ => self.buffer = vec![(0., 0.); size],
         };
