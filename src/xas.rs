@@ -31,7 +31,6 @@ impl Xas {
         let start = ene[0].round();
         let stop = ene[size - 1].round();
         let num = ((stop - start) / step) as u32 + 1;
-        // let energy = peroxide::linspace!(start, stop, num);
         let mut energy = (0..num)
             .map(|i| start + (i as f64 / size as f64) * (stop - start))
             .collect::<Vec<_>>();
