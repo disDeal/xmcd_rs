@@ -1,6 +1,4 @@
 use nannou::prelude::*;
-use xmcd_rs;
-use xmcd_rs::xas::Xas;
 
 mod predata;
 use predata::Data;
@@ -12,14 +10,13 @@ fn main() {
 struct Model {
     _window: window::Id,
     data: predata::Data,
-    paths: Vec<(Point2, Srgba<f32>)>,
     bounds: (f32, f32),
 }
 
 impl Model {
-    fn draw_data(&self, draw: &app::Draw, rect: geom::Rect, mx: f32) {
+    fn draw_data(&self, draw: &app::Draw, rect: geom::Rect) {
         let (left, right) = (rect.left(), rect.right());
-        let (top, bottom) = (rect.top(), rect.bottom());
+        let (top, _) = (rect.top(), rect.bottom());
         let size = self.data.buffer.len() - 1;
         let mut x = Vec::with_capacity(size);
         let mut y = Vec::with_capacity(size);
@@ -51,12 +48,10 @@ impl Model {
             .map(|tri| {
                 tri.map_vertices(|v| {
                     let y_fract = map_range(v.y, 0. - 100., top, 0.0, 1.0);
-                    let x_fract = map_range(mx, left, right, 0.0, 1.0);
                     let color = rgba(0.5, 1., y_fract, y_fract.powf(0.1));
                     geom::vertex::Srgba(v, color)
                 })
             });
-        // println!("{:?}", &tris);
         draw.mesh().tris(tris);
     }
 }
@@ -71,7 +66,7 @@ fn model(app: &App) -> Model {
         .unwrap();
 
     let data = Data::new();
-    let bounds = (
+    let _bounds = (
         data.buffer
             .iter()
             .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
@@ -83,12 +78,10 @@ fn model(app: &App) -> Model {
             .unwrap()
             .1,
     );
-    // println!("{:?}", &bounds);
     let bounds = (1., 2.);
 
     Model {
         _window,
-        paths: Vec::new(),
         data,
         bounds,
     }
@@ -129,11 +122,10 @@ fn view(app: &App, model: &Model, frame: &Frame) {
     let draw = app.draw();
 
     draw.background().color(SLATEGRAY);
-    let weight = 4.0;
 
     let win = app.window_rect();
 
-    model.draw_data(&draw, win, app.mouse.x);
+    model.draw_data(&draw, win);
 
     draw.to_frame(app, &frame).unwrap();
 }

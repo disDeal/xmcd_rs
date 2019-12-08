@@ -3,7 +3,7 @@ use std::io;
 use std::path::PathBuf;
 use std::process::exit;
 use xmcd_rs::Reader;
-use xmcd_rs::{bail, error, Error, Mode};
+use xmcd_rs::{Error, Mode};
 
 use structopt::StructOpt;
 #[derive(Debug, StructOpt)]

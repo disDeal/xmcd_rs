@@ -16,7 +16,7 @@ struct Model {
 impl Model {
     fn draw_xas(&self, draw: &app::Draw, rect: geom::Rect) {
         let (left, right) = (rect.left(), rect.right());
-        let (top, bottom) = (rect.top(), rect.bottom());
+        let (top, _bottom) = (rect.top(), rect.bottom());
 
         let size = self.xas.energy.len() - 1;
         let range = (self.xas.energy[0], self.xas.energy[size]);
@@ -86,7 +86,7 @@ fn model(app: &App) -> Model {
     }
 }
 
-fn update(app: &App, model: &mut Model, _update: Update) {}
+fn update(_app: &App, _model: &mut Model, _update: Update) {}
 
 fn window_event(_app: &App, _model: &mut Model, event: WindowEvent) {
     match event {

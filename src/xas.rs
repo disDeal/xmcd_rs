@@ -3,7 +3,7 @@ use gnuplot::*;
 use nalgebra::DVector;
 use rbf_interp::{Basis, Scatter};
 
-use crate::{bail, Error, Reader};
+use crate::Error;
 
 #[derive(Debug)]
 pub struct Xas {
